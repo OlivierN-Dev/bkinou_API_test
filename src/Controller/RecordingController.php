@@ -10,21 +10,24 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class RecordingController extends AbstractController
 {
+
+    public function __construct(private RecordingService $recording_service){}
+
     #[Route('/recording', name: 'app_recording_index', methods: ['GET'])]
-    public function index(RecordingService $recording_service): JsonResponse
+    public function renderRecordingData(): JsonResponse
     {
-        $data = $recording_service->renderRecordingData();
+        $data = $this->recording_service->recordingData();
         return $this->json(["response" => "success",'data' => $data]);
     }
 
     #[Route('/api/recordings', name: 'app_recording_create', methods: ['POST'])]
-    public function createRecording(Request $request,RecordingService $recording_service): JsonResponse
+    public function Recording(Request $request,RecordingService $recording_service): JsonResponse
     {
         // récupération de toutes les données situées dans le post
         $data = $request->toArray();
 
         $response = $recording_service->createRecording($data);
-        if($response)
+        if(!$response)
         {
             return  $this->json([
                 'response' => 'failed',

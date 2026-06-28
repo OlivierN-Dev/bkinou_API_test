@@ -16,18 +16,9 @@ class StoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Story::class);
     }
 
-    public function getAllStories(Story $story): array
+    public function getAllStories(): array
     {
-        return $this->json([
-            'audioKey' => $story->getAudioKey(),
-            'narrator' => $story->getNarrator(),
-            'createdAt' => $story->getCreatedAt()?->format('Y-m-d H:i:s'),
-            'story' => [
-                'id' => $r->getStory()?->getId(),
-                'title' => $r->getStory()?->getTitle(),
-                'ean' => $r->getStory()?->getEan(),
-            ]
-        ],200);
+        return $this->findAll();
     }
     public function findById(string $id): ?Story
     {

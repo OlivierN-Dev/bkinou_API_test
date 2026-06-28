@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Service\NotificationService;
 use App\Entity\Recording;
 use App\Repository\RecordingRepository;
 use Symfony\Component\Uid\Uuid;
@@ -9,14 +10,15 @@ use App\Repository\StoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 class RecordingService {
 
-    public function __construct(private RecordingRepository $recording_repository,private StoryRepository $storyRepository,private EntityManagerInterface $em) {}
-    public function renderRecordingData()
+    public function __construct(private NotificationService $notification_service,private RecordingRepository $recording_repository,private StoryRepository $storyRepository,private EntityManagerInterface $em) {}
+
+    public function recordingData()
     {
         // bouclé sur chaque elements récupérer ici ($recordingRepository->findAll()) et data = au return donc le tableau
         $data = array_map(function (Recording $r) {
+            
             // récupération de la story qui est en rapport avec l'enregistrement
             $story = $r->getStory();
-
             return [
                 'id' => $r->getId(),
                 'audioKey' => $r->getAudioKey(),
@@ -29,16 +31,15 @@ class RecordingService {
                     'ean' => $story->getEan(),
                 ] : null,
             ];
-        }, $this->recording_repository->findAll());
-
+        }, $this->recording_repository->getAllRecording());
         return $data;
     }
 
     public function createRecording(array $data)
     {
         // récupération de l'id de la story en fonction de l'id envoyé via id_story dans le body
-        $story = $this->storyRepository->findById($data['id_story']);
-        // SI rien n'est trouvé alors return une erreur via le json 
+        $story = $this->storyRepository->findById($data['id_story'] ?? null);
+        // SI rien n'est trouvé alors return une erreur via le json
         if(!$story)
         {
             return;
@@ -58,6 +59,14 @@ class RecordingService {
         $this->em->persist($recording);
         // on execute la requete dans la base
         $this->em->flush();
-            return "Enregistrement Crée avec succès";
+        // on appelle la fonction recordingNotification qui nous renvoie un log
+        $this->notification_service->recordingNotification(
+            $idAudioKey,
+            $story->getTitle()
+        );
+        return [
+            'status' => 'success',
+            'audioKey' => $idAudioKey,
+        ];
     }
 }
