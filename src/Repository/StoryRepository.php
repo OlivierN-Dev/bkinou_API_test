@@ -16,28 +16,25 @@ class StoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Story::class);
     }
 
-    //    /**
-    //     * @return Story[] Returns an array of Story objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Story
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getAllStories(Story $story): array
+    {
+        return $this->json([
+            'audioKey' => $story->getAudioKey(),
+            'narrator' => $story->getNarrator(),
+            'createdAt' => $story->getCreatedAt()?->format('Y-m-d H:i:s'),
+            'story' => [
+                'id' => $r->getStory()?->getId(),
+                'title' => $r->getStory()?->getTitle(),
+                'ean' => $r->getStory()?->getEan(),
+            ]
+        ],200);
+    }
+    public function findById(string $id): ?Story
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
