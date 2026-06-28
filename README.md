@@ -28,10 +28,10 @@ symfony serve
 
 ```http
 GET  http://127.0.0.1:8000/story
-GET  http://localhost:3000/recordings
-GET  http://localhost:3000/api/stories/{id}
-POST http://localhost:3000/api/story
-POST http://localhost:3000/api/recordings
+GET  http://127.0.0.1:8000/recordings
+GET  http://127.0.0.1:8000/api/stories/{id}
+POST http://127.0.0.1:8000/api/story
+POST http://127.0.0.1:8000/api/recordings
 ```
 
 ## Bonus non implémentés
